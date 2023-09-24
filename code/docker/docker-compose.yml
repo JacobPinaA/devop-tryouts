@@ -1,0 +1,41 @@
+version: '3'
+services:
+  php:
+    image: php:8.2-fpm
+    networks:
+      - chicho
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://php:9000"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  nginx:
+    image: nginx:1.18
+    ports:
+      - "8888:80"
+    depends_on:
+      - php
+    networks:
+      - chicho
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://nginx:80/info.php"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: example_password
+      MYSQL_DATABASE: example_db
+    networks:
+      - chicho
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -pPASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+networks:
+  chicho:

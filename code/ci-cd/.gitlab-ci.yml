@@ -1,0 +1,22 @@
+stages:
+  - build
+  - test
+
+variables:
+  DOCKER_IMAGE_NAME: app-image
+  DOCKER_REGISTRY: registry.gitlab.com
+  DOCKER_IMAGE_TAG: latest
+
+build:
+  stage: build
+  script:
+    - docker build -t $DOCKER_REGISTRY/$CI_PROJECT_NAMESPACE/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -f app/Dockerfile .
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $DOCKER_REGISTRY
+    - docker push $DOCKER_REGISTRY/$CI_PROJECT_NAMESPACE/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+## Nota: Se deben configurar las variables CI_REGISTRY_USER y CI_REGISTRY_PASSWORD para autenticarnos en el registro de Gitlab
+test:
+  stage: test
+  script:
+## Nota: aquí podemos colocar los comandos para ejecutar tus pruebas por ejemplo:
+   - npm install
+   - npm test
